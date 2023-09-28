@@ -1,0 +1,71 @@
+db.organizations.aggregate([{$project:{'uid': {'$toString':'$_id'}}},
+{$lookup:{from: 'tranches', localField: 'uid', foreignField: 'org._id', as: 'tranches'}},
+{$unwind:'$tranches'},
+{$project:{'tid':{$toString':'$tarnches._id'}}},
+{$lookup:{from: 'transaction', localField: 'tid', foreignField: 'trancheId', as: 'transactions'}}]).pretty()
+
+
+db.organizations.aggregate([
+    {$project:{'uid': {'$toString':'$_id'}}},
+    {$lookup:{from: 'tranches', localField: 'uid', foreignField: 'org._id', as: 'tranches'}},
+    {$unwind:'$tranches'},
+    {$addFields:{'tid':{'$toString':'$tranches._id'}}},
+    {$lookup:{from: 'transaction', localField: 'tid', foreignField: 'trancheId', as: 'transactions'}},
+    {$group:{_id:'$_id', name: : {$first: '$name'}, totalTransactionAmount: {$sum : 'transactions.repay'}}}
+    ]).pretty()
+
+
+    db.organizations.aggregate([
+        {$project:{'uid': {'$toString':'$_id'}}},
+        {$lookup:{from: 'tranches', localField: 'uid', foreignField: 'org._id', as: 'tranches'}},
+        {$unwind:'$tranches'},
+        {$addFields:{'tid':{'$toString':'$tranches._id'}}},
+        {$lookup:{from: 'transactions', localField: 'tid', foreignField: 'trancheId', as: 'transactions'}}]).pretty()
+
+
+        db.organizations.aggregate([{$project:{'uid': {'$toString':'$_id'}}},{$lookup:{from: 'tranches', localField: 'uid', foreignField: 'org._id', as: 'tranches'}},{$unwind:'$tranches'},{$addFields:{'tid':{'$toString':'$tranches._id'}}},{$lookup:{from: 'transactions', localField: 'tid', foreignField: 'trancheId', as: 'transactions'}},{$group: {_id:'$_id', name:{'$first': '$name'}, totalTransactionAmount:{$sum: '$transactions.repay'}}}]).pretty()
+        db.organizations.aggregate([
+            {
+              $addFields: {
+                'uid': { '$toString': '$_id' }
+              }
+            },
+            {
+              $lookup: {
+                from: 'tranches',
+                localField: 'uid',
+                foreignField: 'org._id',
+                as: 'tranches'
+              }
+            },
+            {
+              $unwind: '$tranches'
+            },
+            {
+              $addFields: {
+                'tid': { '$toString': '$tranches._id' }
+              }
+            },
+            {
+              $lookup: {
+                from: 'transactions',
+                localField: 'tid',
+                foreignField: 'trancheId',
+                as: 'transactions'
+              }
+            },
+            {
+              $unwind: {
+                path: '$transactions',
+                preserveNullAndEmptyArrays: true
+              }
+            },
+            {
+              $group: {
+                _id: '$_id',
+                name: { $first: '$name' },
+                totalRepay: { $sum: '$transactions.repay' },
+                limit: { $first: '$limit' } // Добавить поле "limit" в вывод
+              }
+            }
+          ])
